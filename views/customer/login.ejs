@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login - MicroFinance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        body { animation: fadeInUp 0.6s ease-out; }
+        .form-control {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-control:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.05);
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+            border-color: #2563eb !important;
+        }
+        .btn-primary {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 28px rgba(37, 99, 235, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="page-bg min-h-screen py-6 sm:py-10 px-4">
+    <div class="w-full max-w-3xl mx-auto surface rounded-2xl">
+        <div class="p-6 sm:p-8 lg:p-10">
+            <!-- Header -->
+            <div class="text-center mb-8 sm:mb-10 space-y-2">
+                <div class="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-md">
+                    <i class="fas fa-lock-open text-xl sm:text-2xl"></i>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Welcome Back</h1>
+                <p class="text-slate-500 text-sm sm:text-base">Sign in to access your loans and dashboard</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-slate-700 flex items-center gap-2 justify-center">
+                        <i class="fas fa-envelope text-indigo-600"></i>
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email"
+                        class="form-control w-full text-center"
+                        placeholder="you@example.com"
+                        required
+                    >
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-slate-700 flex items-center gap-2 justify-center">
+                        <i class="fas fa-key text-indigo-600"></i>
+                        Password
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            name="password"
+                            class="form-control w-full text-center pr-12"
+                            id="passwordInput"
+                            placeholder="Enter your password"
+                            required
+                        >
+                        <button 
+                            type="button"
+                            class="absolute right-4 top-3.5 text-slate-500 hover:text-slate-700"
+                            onclick="togglePasswordVisibility()"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" class="h-5 w-5 rounded border-2 border-slate-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500" name="rememberMe">
+                        <span class="text-sm font-semibold text-slate-700">Remember me on this device</span>
+                    </label>
+                </div>
+
+                <span class="form-error block text-center" id="generalError"></span>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary w-full py-3 mt-2 flex items-center justify-center gap-2.5 text-base font-semibold bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300 transform hover:-translate-y-1">
+                    <i class="fas fa-sign-in-alt"></i> <span id="submitText">Sign In to Dashboard</span>
+                </button>
+
+                <!-- Forgot Password Link -->
+                <div class="text-center">
+                    <a href="/customer/forgot-password" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:underline transition">
+                        Forgot your password?
+                    </a>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="my-8 relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t-2 border-slate-200"></div>
+                </div>
+                <div class="relative flex justify-center">
+                    <span class="px-4 bg-white text-slate-500 text-xs font-semibold uppercase tracking-wider">New customer?</span>
+                </div>
+            </div>
+
+            <!-- Register Button -->
+            <a href="/customer/register" class="btn btn-primary w-full py-3 flex items-center justify-center gap-2.5 text-white font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:shadow-lg hover:shadow-green-200 rounded-xl transition-all duration-300 transform hover:-translate-y-1">
+                <i class="fas fa-user-plus"></i> Create New Account
+            </a>
+
+            <!-- Footer Links -->
+            <p class="text-center text-gray-600 text-sm mt-8">
+                <a href="/" class="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline">
+                    Back to Home
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('passwordInput');
+            const icon = event.target.closest('button').querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.querySelector('input[name="email"]').value.trim();
+            const password = document.querySelector('input[name="password"]').value;
+            const errorElement = document.getElementById('generalError');
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+
+            // Validate inputs
+            if (!email || !password) {
+                errorElement.textContent = 'Please enter email and password';
+                return;
+            }
+
+            // Clear previous errors
+            errorElement.textContent = '';
+            submitBtn.disabled = true;
+            const originalText = submitText.innerHTML;
+            submitText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+            try {
+                console.log('Attempting login with email:', email);
+                
+                const response = await fetch('/api/auth/customer/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.ok && data.success) {
+                    console.log('✓ Login successful');
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.customer));
+                    window.location.href = '/customer/dashboard';
+                } else {
+                    const errorMsg = data.message || 'Login failed. Please check your credentials.';
+                    console.error('❌ Login error:', errorMsg);
+                    errorElement.textContent = errorMsg;
+                }
+            } catch (error) {
+                console.error('❌ Network error:', error);
+                errorElement.textContent = 'Network error. Please check your connection and try again.';
+            } finally {
+                submitBtn.disabled = false;
+                submitText.innerHTML = originalText;
+            }
+        });
+    </script>
+</body>
+</html>

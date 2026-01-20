@@ -1,0 +1,35 @@
+{
+  "name": "micro-finance-system",
+  "version": "1.0.0",
+  "description": "Production-ready Micro-Finance Management System",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "seed:admin": "node server/utils/seedAdmin.js",
+    "seed:loans": "node server/utils/seedLoans.js"
+  },
+  "keywords": [
+    "microfinance",
+    "banking",
+    "loan",
+    "fintech"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.0",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

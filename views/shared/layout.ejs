@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/feedback.css">
+</head>
+<body class="page-bg">
+    <!-- Navigation Bar -->
+    <nav class="floating-nav text-slate-900">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold leading-tight">MicroFinance</h1>
+                    <p class="text-xs text-slate-500">Inclusive finance, built for people</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 sm:space-x-4 text-sm font-semibold">
+                <a href="/" class="px-3 py-2 rounded-lg text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition">Home</a>
+                <a href="/about" class="px-3 py-2 rounded-lg text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition">About</a>
+                <a href="/customer/login" class="px-3 py-2 rounded-lg text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition">Login</a>
+                <a href="/customer/register" class="btn btn-primary text-white px-4 py-2 rounded-lg">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <%- include(body) %>
+
+    <!-- Footer -->
+    <footer class="footer-dark py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                <div>
+                    <h3 class="font-bold mb-4 text-lg">About Us</h3>
+                    <p class="text-slate-400 leading-relaxed">Empowering financial inclusion through accessible, transparent, and responsible microfinance solutions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4 text-lg">Quick Links</h3>
+                    <ul class="text-slate-400 space-y-2">
+                        <li><a href="/" class="hover:text-white transition">Home</a></li>
+                        <li><a href="/about" class="hover:text-white transition">About</a></li>
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4 text-lg">Contact</h3>
+                    <p class="text-slate-400">support@microfinance.com</p>
+                    <p class="text-slate-400">1800-123-4567</p>
+                </div>
+            </div>
+            <div class="border-t border-slate-700 pt-4 text-center text-slate-500 text-sm">
+                <p>&copy; 2024 Micro Finance Management System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

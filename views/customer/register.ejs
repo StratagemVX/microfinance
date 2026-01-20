@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MicroFinance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/feedback.css">
+</head>
+<body class="page-bg min-h-screen py-6 sm:py-10 px-4">
+    <div class="w-full max-w-3xl mx-auto surface rounded-2xl">
+        <div class="p-6 sm:p-8 lg:p-10">
+            <!-- Header -->
+            <div class="text-center mb-6 sm:mb-8 space-y-2">
+                <div class="inline-flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-md">
+                    <i class="fas fa-piggy-bank text-xl sm:text-2xl"></i>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900">Create Your Account</h1>
+                <p class="text-slate-500 text-sm sm:text-base">Three quick steps to access your dashboard</p>
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="flex items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8 text-xs sm:text-sm font-semibold overflow-x-auto pb-2">
+                <span class="pill-indicator step active whitespace-nowrap"><i class="fas fa-user"></i> <span class="hidden sm:inline">Step</span> 1</span>
+                <span class="pill-indicator step inactive whitespace-nowrap"><i class="fas fa-map-marker-alt"></i> <span class="hidden sm:inline">Step</span> 2</span>
+                <span class="pill-indicator step inactive whitespace-nowrap"><i class="fas fa-briefcase"></i> <span class="hidden sm:inline">Step</span> 3</span>
+            </div>
+
+            <!-- Form -->
+            <form id="registerForm" class="space-y-6">
+                <!-- Step 1: Personal Information -->
+                <div id="step1" class="space-y-6 form-section">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><i class="fas fa-user-circle text-indigo-600"></i> Personal Information</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">First Name</label>
+                            <input 
+                                type="text" 
+                                name="firstName" 
+                                class="form-control"
+                                placeholder="John"
+                                required
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Last Name</label>
+                            <input 
+                                type="text" 
+                                name="lastName" 
+                                class="form-control"
+                                placeholder="Doe"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            id="email"
+                            class="form-control"
+                            placeholder="john@example.com"
+                            required
+                        >
+                        <div class="validation-feedback hidden" id="emailFeedback">
+                            <span class="text-red-500 text-sm" id="emailError"></span>
+                            <span class="text-green-500 text-sm" id="emailSuccess"></span>
+                        </div>
+                        <p class="helper-text">We'll use this to send loan updates and important documents</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+                        <input 
+                            type="tel" 
+                            name="phone" 
+                            id="phone"
+                            class="form-control"
+                            placeholder="9876543210"
+                            pattern="[0-9]{10}"
+                            required
+                        >
+                        <div class="validation-feedback hidden" id="phoneFeedback">
+                            <span class="text-red-500 text-sm" id="phoneError"></span>
+                            <span class="text-green-500 text-sm" id="phoneSuccess"></span>
+                        </div>
+                        <p class="helper-text">Must be a 10-digit Indian mobile number</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+                            <input 
+                                type="password" 
+                                name="password" 
+                                id="password"
+                                class="form-control"
+                                placeholder="Min. 6 characters"
+                                required
+                            >
+                            <div class="password-strength-meter">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strengthFill"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText">Weak</span>
+                            </div>
+                            <p class="helper-text text-xs mt-2">Must contain uppercase, lowercase, number and special character</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Confirm Password</label>
+                            <input 
+                                type="password" 
+                                name="confirmPassword" 
+                                id="confirmPassword"
+                                class="form-control"
+                                placeholder="Confirm password"
+                                required
+                            >
+                            <div class="validation-feedback hidden" id="confirmPasswordFeedback">
+                                <span class="text-red-500 text-sm" id="confirmPasswordError"></span>
+                                <span class="text-green-500 text-sm" id="confirmPasswordSuccess"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <span class="form-error block" id="step1Error"></span>
+
+                    <button type="button" id="btnContinueToAddress" class="btn btn-primary w-full" onclick="nextStep(1)">
+                        Continue to Address
+                    </button>
+                </div>
+
+                <!-- Step 2: Address Information -->
+                <div id="step2" class="space-y-6 hidden form-section">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><i class="fas fa-map-pin text-indigo-600"></i> Address Information</h3>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Street Address</label>
+                        <input 
+                            type="text" 
+                            name="street" 
+                            class="form-control"
+                            placeholder="123 Main Street"
+                            required
+                        >
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">City</label>
+                            <input 
+                                type="text" 
+                                name="city" 
+                                class="form-control"
+                                placeholder="Mumbai"
+                                required
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">State</label>
+                            <input 
+                                type="text" 
+                                name="state" 
+                                class="form-control"
+                                placeholder="Maharashtra"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Pincode</label>
+                        <input 
+                            type="text" 
+                            name="pincode" 
+                            class="form-control"
+                            placeholder="400001"
+                            pattern="[0-9]{6}"
+                            required
+                        >
+                    </div>
+                    <span class="form-error block" id="step2Error"></span>
+                    <div class="flex gap-4">
+                        <button type="button" id="btnBackToPersonal" class="btn btn-secondary w-1/2" onclick="prevStep(2)">
+                            Back
+                        </button>
+                        <button type="button" id="btnContinueToFinancial" class="btn btn-primary w-1/2" onclick="nextStep(2)">
+                            Continue to Financial
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Financial Information -->
+                <div id="step3" class="space-y-6 hidden form-section" style="display: none;">
+                    <div style="display: block;">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><i class="fas fa-briefcase text-indigo-600"></i> Financial Information</h3>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Monthly Income (₹)</label>
+                        <input 
+                            type="number" 
+                            name="monthlyIncome" 
+                            class="form-control"
+                            placeholder="50000"
+                            min="0"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Occupation</label>
+                        <input 
+                            type="text" 
+                            name="occupation" 
+                            class="form-control"
+                            placeholder="Software Engineer"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Employment Type</label>
+                        <select name="employmentType" class="form-control" required>
+                            <option value="">Select employment type</option>
+                            <option value="salaried">Salaried</option>
+                            <option value="self-employed">Self-Employed</option>
+                            <option value="business">Business Owner</option>
+                            <option value="retired">Retired</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-start gap-2 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <input type="checkbox" id="terms" class="mt-1" required>
+                        <label for="terms" class="text-sm text-gray-700">
+                            I agree to the Terms and Conditions and Privacy Policy
+                        </label>
+                    </div>
+
+                    <span class="form-error block" id="errorMessage"></span>
+
+                    <div class="flex gap-4 pt-4">
+                        <button type="button" id="btnBackToAddress" class="btn btn-secondary w-1/2" onclick="prevStep(3)">
+                            Back
+                        </button>
+                        <button type="submit" id="btnSubmitRegister" class="btn btn-primary w-1/2 flex items-center justify-center gap-2">
+                            <i class="fas fa-check-circle"></i> Create Account
+                        </button>
+                    </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Footer Links -->
+            <p class="text-center text-gray-600 text-sm mt-6">
+                Already have an account?
+                <a href="/customer/login" class="text-purple-600 font-semibold hover:text-purple-700">
+                    Login Here
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Ensure step navigation works even if inline handlers are blocked
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnContinueToAddress = document.getElementById('btnContinueToAddress');
+            const btnBackToPersonal = document.getElementById('btnBackToPersonal');
+            const btnContinueToFinancial = document.getElementById('btnContinueToFinancial');
+            const btnBackToAddress = document.getElementById('btnBackToAddress');
+
+            if (btnContinueToAddress) {
+                btnContinueToAddress.addEventListener('click', () => {
+                    try { nextStep(1); } catch (e) { console.error('Failed to go to address step:', e); }
+                });
+            }
+            if (btnBackToPersonal) {
+                btnBackToPersonal.addEventListener('click', () => {
+                    try { prevStep(2); } catch (e) { console.error('Failed to go back to personal step:', e); }
+                });
+            }
+            if (btnContinueToFinancial) {
+                btnContinueToFinancial.addEventListener('click', () => {
+                    try { nextStep(2); } catch (e) { console.error('Failed to go to financial step:', e); }
+                });
+            }
+            if (btnBackToAddress) {
+                btnBackToAddress.addEventListener('click', () => {
+                    try { prevStep(3); } catch (e) { console.error('Failed to go back to address step:', e); }
+                });
+            }
+        });
+
+        function nextStep(currentStep) {
+            // Clear previous error messages
+            const errorElement = document.getElementById(`step${currentStep}Error`);
+            if (errorElement) {
+                errorElement.textContent = '';
+            }
+            
+            // Validate current step
+            const validationResult = validateStep(currentStep);
+            if (!validationResult.isValid) {
+                if (errorElement) {
+                    errorElement.textContent = validationResult.message || 'Please fill in all required fields correctly';
+                    errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+            document.getElementById(`step${currentStep + 1}`).classList.remove('hidden');
+            // Ensure proper display for step 3
+            if (currentStep + 1 === 3) {
+                document.getElementById('step3').style.display = 'block';
+            }
+
+            // Update step indicator
+            updateStepIndicator(currentStep + 1);
+            
+            // Scroll to top of form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep(currentStep) {
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+            document.getElementById(`step${currentStep - 1}`).classList.remove('hidden');
+            // Ensure proper display
+            if (currentStep - 1 < 3) {
+                document.getElementById('step3').style.display = 'none';
+            }
+
+            // Update step indicator
+            updateStepIndicator(currentStep - 1);
+            
+            // Scroll to top of form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateStepIndicator(activeStep) {
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < activeStep) {
+                    step.classList.add('active');
+                    step.classList.remove('inactive');
+                } else {
+                    step.classList.remove('active');
+                    step.classList.add('inactive');
+                }
+            });
+        }
+
+        function validateStep(step) {
+            const form = document.getElementById('registerForm');
+            const inputs = form.querySelectorAll(`#step${step} input:not([type="hidden"]), #step${step} select`);
+            
+            let isValid = true;
+            let invalidFields = [];
+            
+            for (let input of inputs) {
+                input.classList.remove('border-red-500');
+                
+                // Special handling for checkboxes
+                if (input.type === 'checkbox') {
+                    if (input.hasAttribute('required') && !input.checked) {
+                        input.classList.add('border-red-500');
+                        isValid = false;
+                        const label = form.querySelector(`label[for="${input.id}"]`);
+                        invalidFields.push(label ? label.textContent.trim() : input.getAttribute('name'));
+                    }
+                } else {
+                    // Skip optional fields or check validity
+                    if (input.hasAttribute('required') || input.value.trim() !== '') {
+                        if (!input.checkValidity() || input.value.trim() === '') {
+                            input.classList.add('border-red-500');
+                            isValid = false;
+                            
+                            // Get field name from label or name attribute
+                            const label = form.querySelector(`label[for="${input.id}"]`) || 
+                                         (input.previousElementSibling?.tagName === 'LABEL' ? input.previousElementSibling : null);
+                            const fieldName = label ? label.textContent.trim() : input.getAttribute('name');
+                            invalidFields.push(fieldName);
+                        }
+                    }
+                }
+            }
+
+            if (step === 1) {
+                const password = form.querySelector('input[name="password"]').value;
+                const confirmPassword = form.querySelector('input[name="confirmPassword"]').value;
+                if (password !== confirmPassword) {
+                    form.querySelector('input[name="confirmPassword"]').classList.add('border-red-500');
+                    return {
+                        isValid: false,
+                        message: 'Passwords do not match'
+                    };
+                }
+            }
+
+            if (!isValid) {
+                return {
+                    isValid: false,
+                    message: `Please fill in all required fields correctly${invalidFields.length > 0 ? ': ' + invalidFields.slice(0, 3).join(', ') : ''}`
+                };
+            }
+
+            return { isValid: true };
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Clear previous errors
+            document.getElementById('errorMessage').textContent = '';
+
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            // Disable submit button and show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            
+            // Helper function to get form value safely
+            const getFormValue = (name, isSelect = false) => {
+                const selector = isSelect ? `select[name="${name}"]` : `input[name="${name}"]`;
+                const element = form.querySelector(selector);
+                if (!element) {
+                    console.error(`Form element not found: ${name}`);
+                    return '';
+                }
+                return element.value.trim ? element.value.trim() : element.value;
+            };
+            
+            // Collect all form data including from hidden sections
+            const data = {
+                firstName: getFormValue('firstName'),
+                lastName: getFormValue('lastName'),
+                email: getFormValue('email'),
+                phone: getFormValue('phone'),
+                password: form.querySelector('input[name="password"]').value,
+                confirmPassword: form.querySelector('input[name="confirmPassword"]').value,
+                street: getFormValue('street'),
+                city: getFormValue('city'),
+                state: getFormValue('state'),
+                pincode: getFormValue('pincode'),
+                monthlyIncome: parseFloat(getFormValue('monthlyIncome')),
+                occupation: getFormValue('occupation'),
+                employmentType: getFormValue('employmentType', true)
+            };
+
+            // Debug: Log the data being sent
+            console.log('Registration data:', data);
+            console.log('Address fields:', {
+                street: data.street,
+                city: data.city,
+                state: data.state,
+                pincode: data.pincode
+            });
+
+            // Validate that address fields are not empty
+            if (!data.street || !data.city || !data.state || !data.pincode) {
+                document.getElementById('errorMessage').textContent = 'Please fill in all address fields';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+                console.error('Address validation failed:', { street: data.street, city: data.city, state: data.state, pincode: data.pincode });
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/customer/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                const result = await response.json();
+
+                console.log('Server response:', result);
+                console.log('Response status code:', response.status);
+
+                if (response.ok && result.success) {
+                    console.log('✓ Registration successful!');
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.customer));
+                    alert('Account created successfully! You will be redirected to your dashboard.');
+                    window.location.href = '/customer/dashboard';
+                } else {
+                    let errorMsg = result.message || 'Registration failed. Please try again.';
+                    if (result.errors && result.errors.length > 0) {
+                        const errorDetails = result.errors.map(e => `${e.param || ''}: ${e.msg}`).join(', ');
+                        errorMsg += ' (' + errorDetails + ')';
+                    }
+                    console.error('❌ Registration error:', errorMsg);
+                    document.getElementById('errorMessage').textContent = errorMsg;
+                    console.error('Full error response:', result);
+                }
+            } catch (error) {
+                console.error('❌ Network/Parse error:', error);
+                console.error('Error details:', error.message);
+                console.error('Error stack:', error.stack);
+                document.getElementById('errorMessage').textContent = 'Network error: ' + error.message + '. Please check your connection and try again.';
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    </script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/registration-validation.js"></script>
+</body>
+</html>

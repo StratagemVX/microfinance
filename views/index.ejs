@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroFinance - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/feedback.css">
+</head>
+<body class="page-bg">
+    <!-- Navigation Bar -->
+    <nav class="floating-nav text-slate-900">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold leading-tight">MicroFinance</h1>
+                    <p class="text-xs text-slate-500">Inclusive finance, built for people</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 sm:space-x-4 text-sm font-semibold">
+                <a href="/" class="px-3 py-2 rounded-lg text-blue-700 bg-blue-50 transition">Home</a>
+                <a href="/about" class="px-3 py-2 rounded-lg text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition">About</a>
+                <a href="/customer/login" class="px-3 py-2 rounded-lg text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition">Login</a>
+                <a href="/customer/register" class="btn btn-primary text-white px-4 py-2 rounded-lg">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Landing Page Body -->
+    <main class="max-w-7xl mx-auto px-4 py-12 space-y-16">
+        <!-- Hero Section -->
+        <section class="hero-gradient text-white rounded-3xl p-10 lg:p-16 shadow-xl">
+            <div class="max-w-4xl mx-auto text-center space-y-6">
+                <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 text-sm font-semibold border border-white/20">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure. Inclusive. Fast.</span>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-bold leading-tight">Welcome to MicroFinance</h2>
+                <p class="text-lg md:text-xl text-slate-200">Empowering financial inclusion through accessible and affordable microfinance solutions.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
+                    <a href="/customer/register" class="btn btn-primary px-8 py-3 text-base">Open Account</a>
+                    <a href="/customer/login" class="btn btn-ghost px-8 py-3 text-base text-white border-white/50 hover:bg-white/10">Customer Login</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="space-y-10">
+            <h3 class="text-3xl font-bold text-center text-slate-900">Why Choose Us?</h3>
+            <div class="card-grid cols-3">
+                <div class="card">
+                    <div class="h-12 w-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-4"><i class="fas fa-handshake text-2xl"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Trusted Partner</h4>
+                    <p class="text-slate-600">Regulated and licensed microfinance institution committed to transparency.</p>
+                </div>
+                <div class="card">
+                    <div class="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-4"><i class="fas fa-bolt text-2xl"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Quick Approvals</h4>
+                    <p class="text-slate-600">Fast loan processing with decisions within 24-48 hours.</p>
+                </div>
+                <div class="card">
+                    <div class="h-12 w-12 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center mb-4"><i class="fas fa-lock text-2xl"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Secure & Safe</h4>
+                    <p class="text-slate-600">Bank-grade security with encrypted data protection.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loan Products Section -->
+        <section class="card p-8 space-y-10">
+            <div class="text-center space-y-3">
+                <h3 class="text-3xl font-bold text-slate-900">Our Loan Products</h3>
+                <p class="text-slate-600">Flexible options designed for personal, business, and education needs.</p>
+            </div>
+            <div class="card-grid cols-3">
+                <div class="card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-600">
+                    <h4 class="text-2xl font-bold mb-2">Personal Loans</h4>
+                    <p class="text-slate-700 mb-4">Up to ₹5,00,000 for personal needs.</p>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Quick disbursal</li>
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Flexible EMI</li>
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Low interest rates</li>
+                    </ul>
+                </div>
+                <div class="card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-600">
+                    <h4 class="text-2xl font-bold mb-2">Business Loans</h4>
+                    <p class="text-slate-700 mb-4">Up to ₹25,00,000 for business growth.</p>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Flexible repayment</li>
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Minimal documentation</li>
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Expert guidance</li>
+                    </ul>
+                </div>
+                <div class="card bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                    <h4 class="text-2xl font-bold mb-2">Education Loans</h4>
+                    <p class="text-slate-700 mb-4">Up to ₹10,00,000 for education.</p>
+                    <ul class="text-sm text-slate-600 space-y-2">
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Lower interest rates</li>
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>Deferred payment options</li>
+                        <li><i class="fas fa-check text-emerald-600 mr-2"></i>No collateral</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="card text-center">
+                <div class="text-4xl font-bold text-blue-600 mb-2">10K+</div>
+                <p class="text-slate-600 font-semibold">Happy Customers</p>
+            </div>
+            <div class="card text-center">
+                <div class="text-4xl font-bold text-green-600 mb-2">₹500Cr+</div>
+                <p class="text-slate-600 font-semibold">Loans Disbursed</p>
+            </div>
+            <div class="card text-center">
+                <div class="text-4xl font-bold text-orange-600 mb-2">98%</div>
+                <p class="text-slate-600 font-semibold">Customer Satisfaction</p>
+            </div>
+            <div class="card text-center">
+                <div class="text-4xl font-bold text-purple-600 mb-2">24/7</div>
+                <p class="text-slate-600 font-semibold">Customer Support</p>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="card bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-center p-10 lg:p-14 shadow-xl">
+            <h3 class="text-3xl font-bold mb-3">Ready to Get Started?</h3>
+            <p class="text-lg text-indigo-100 mb-8">Join thousands of customers who have transformed their lives with our microfinance solutions.</p>
+            <a href="/customer/register" class="bg-white text-indigo-700 px-8 py-3 rounded-xl font-semibold hover:bg-indigo-50 transition inline-block">Register Now</a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-dark py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                <div>
+                    <h3 class="font-bold mb-4 text-lg">About Us</h3>
+                    <p class="text-slate-400 leading-relaxed">Empowering financial inclusion through accessible, transparent, and responsible microfinance solutions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4 text-lg">Quick Links</h3>
+                    <ul class="text-slate-400 space-y-2">
+                        <li><a href="/" class="hover:text-white transition">Home</a></li>
+                        <li><a href="/about" class="hover:text-white transition">About</a></li>
+                        <li><a href="/customer/login" class="hover:text-white transition">Customer Login</a></li>
+                        <li><a href="/admin/login" class="hover:text-white transition">Admin Login</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold mb-4 text-lg">Contact</h3>
+                    <p class="text-slate-400">support@microfinance.com</p>
+                    <p class="text-slate-400">1800-123-4567</p>
+                    <div class="flex gap-4 mt-4">
+                        <a href="#" class="text-slate-400 hover:text-white transition"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-slate-400 hover:text-white transition"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-slate-400 hover:text-white transition"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-700 pt-4 text-center text-slate-500 text-sm">
+                <p>&copy; 2026 Micro Finance Management System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/notifications.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

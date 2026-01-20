@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - MicroFinance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        body { animation: fadeInUp 0.6s ease-out; }
+        .form-control {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-control:hover {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.05);
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+            border-color: #dc2626 !important;
+        }
+        .btn-primary {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 28px rgba(220, 38, 38, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 35px rgba(220, 38, 38, 0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="page-bg min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+    <div class="w-full max-w-4xl mx-auto">
+        <div class="surface overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2 rounded-2xl">
+            <!-- Left Panel -->
+            <div class="hidden md:flex flex-col p-10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900 text-white relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20">
+                    <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-600/20 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-red-500/10 rounded-full blur-3xl"></div>
+                </div>
+
+                <div class="relative z-10">
+                    <div class="flex items-center gap-4 mb-10">
+                        <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white shadow-lg">
+                            <i class="fas fa-shield-alt text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-red-400 text-xs font-bold uppercase tracking-wider">Administration</p>
+                            <h1 class="text-3xl font-bold">Secure Portal</h1>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 text-slate-200 text-sm">
+                        <p class="leading-relaxed font-medium">Access the administrative control panel to manage customers, loan applications, and system operations.</p>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fas fa-check text-red-400 text-xs"></i>
+                                </div>
+                                <span>Role-based access control</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fas fa-check text-red-400 text-xs"></i>
+                                </div>
+                                <span>Multi-layer security & encryption</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fas fa-check text-red-400 text-xs"></i>
+                                </div>
+                                <span>Complete audit trail & logging</span>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fas fa-check text-red-400 text-xs"></i>
+                                </div>
+                                <span>Real-time system monitoring</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-8 border-t border-slate-700">
+                        <p class="text-xs text-slate-400 flex items-center gap-2">
+                            <i class="fas fa-lock-open text-green-400"></i> Two-factor authentication enabled
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Form -->
+            <div class="p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+                <div class="text-center mb-8 sm:mb-10 space-y-3">
+                    <div class="flex justify-center md:hidden">
+                        <div class="inline-flex items-center justify-center h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 text-white shadow-xl">
+                            <i class="fas fa-lock text-xl sm:text-2xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Admin Login</h1>
+                        <p class="text-slate-500 mt-1 font-medium text-xs sm:text-sm">Access restricted to administrators</p>
+                    </div>
+                </div>
+
+                <!-- Security Alert -->
+                <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs sm:text-sm font-medium flex items-start gap-2 sm:gap-3">
+                    <i class="fas fa-triangle-exclamation flex-shrink-0 mt-0.5 text-amber-600"></i>
+                    <div>
+                        <strong>Security Reminder:</strong> <span class="hidden sm:inline">Never share your credentials.</span> This portal logs all access.
+                    </div>
+                </div>
+
+                <form id="adminLoginForm" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-800 flex items-center gap-2 mb-2.5">
+                            <i class="fas fa-user-tie text-red-600 text-xs"></i> Admin Email
+                        </label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            class="form-control w-full pl-4 pr-4 py-3 text-slate-900 placeholder-slate-400"
+                            placeholder="admin@microfinance.com"
+                            required
+                        >
+                        <span class="form-error" id="emailError"></span>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-800 flex items-center gap-2 mb-2.5">
+                            <i class="fas fa-key text-red-600 text-xs"></i> Password
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                name="password" 
+                                class="form-control w-full pl-4 pr-12 py-3 text-slate-900 placeholder-slate-400"
+                                id="passwordInput"
+                                placeholder="Enter your secure password"
+                                required
+                            >
+                            <button 
+                                type="button" 
+                                class="absolute right-4 top-3.5 text-slate-500 hover:text-slate-700 transition"
+                                onclick="togglePasswordVisibility()"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="form-error" id="passwordError"></span>
+                    </div>
+
+                    <div class="flex items-center">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500 transition" id="rememberMe">
+                            <span class="text-sm text-slate-600 group-hover:text-slate-700">Trust this device for 7 days</span>
+                        </label>
+                    </div>
+
+                    <span class="form-error block" id="generalError"></span>
+
+                    <button type="submit" class="btn btn-primary w-full py-3 flex items-center justify-center gap-2.5 text-base font-semibold bg-gradient-to-r from-red-600 to-red-700 text-white mt-8">
+                        <span id="submitText"><i class="fas fa-sign-in-alt"></i> Sign In to Admin</span>
+                        <span id="submitLoader" class="hidden">
+                            <i class="fas fa-spinner fa-spin"></i> Verifying...
+                        </span>
+                    </button>
+
+                    <!-- Forgot Password Link -->
+                    <div class="text-center mt-4">
+                        <a href="/admin/forgot-password" class="text-sm font-semibold text-red-600 hover:text-red-700 hover:underline transition">
+                            <i class="fas fa-key"></i> Forgot your password?
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Demo Credentials -->
+                <div class="mt-8 p-4 bg-slate-50 rounded-xl border border-slate-200 text-center text-sm">
+                    <p class="text-slate-600 font-semibold mb-2"><i class="fas fa-info-circle text-blue-600 mr-2"></i> Demo Credentials</p>
+                    <p class="text-slate-600 text-xs">Email: <code class="bg-white px-2 py-1 rounded border border-slate-200">admin@test.com</code></p>
+                    <p class="text-slate-600 text-xs">Password: <code class="bg-white px-2 py-1 rounded border border-slate-200">Admin@123</code></p>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-8 text-center space-y-3">
+                    <p class="text-sm text-slate-600">
+                        Not an administrator? 
+                        <a href="/customer/login" class="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline transition">
+                            Customer Login
+                        </a>
+                    </p>
+                    <a href="/" class="text-sm text-slate-600 hover:text-slate-800 hover:underline transition inline-flex items-center gap-1">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('passwordInput');
+            const icon = event.target.closest('button').querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.querySelector('input[name="email"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+
+            // Clear errors
+            document.getElementById('generalError').textContent = '';
+            document.getElementById('submitText').classList.add('hidden');
+            document.getElementById('submitLoader').classList.remove('hidden');
+
+            try {
+                const response = await fetch('/api/auth/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('admin', JSON.stringify(data.admin));
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    document.getElementById('generalError').textContent = data.message || 'Login failed';
+                }
+            } catch (error) {
+                document.getElementById('generalError').textContent = 'Network error. Please try again.';
+            } finally {
+                document.getElementById('submitText').classList.remove('hidden');
+                document.getElementById('submitLoader').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
