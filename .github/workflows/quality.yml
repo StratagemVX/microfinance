@@ -1,0 +1,56 @@
+name: Microfinance quality and dependency checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - security/remove-seeded-passwords
+      - security/notification-xss
+      - security/dashboard-html-escaping
+
+permissions:
+  contents: read
+
+jobs:
+  node-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies and create CI-only lockfile
+        run: npm install --ignore-scripts
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          find server public/js -type f -name '*.js' -print0 | xargs -0 -r -n1 node --check
+
+      - name: Compile EJS templates
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const ejs = require('ejs');
+          function walk(dir) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) walk(full);
+              else if (entry.isFile() && full.endsWith('.ejs')) {
+                ejs.compile(fs.readFileSync(full, 'utf8'), { filename: full });
+              }
+            }
+          }
+          walk('views');
+          console.log('All EJS templates compiled.');
+          NODE
