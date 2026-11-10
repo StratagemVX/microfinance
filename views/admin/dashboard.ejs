@@ -180,6 +180,22 @@
     </div>
 
     <script>
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[character]);
+        }
+
+        function safeMongoId(value) {
+            const id = String(value ?? '');
+            return /^[a-f0-9]{24}$/i.test(id) ? id : '';
+        }
+
+        function applicationStatusClass(status) {
+            const classes = { pending: 'pending', under_review: 'pending', approved: 'approved', rejected: 'rejected', active: 'approved' };
+            return classes[String(status)] || 'pending';
+        }
+
         // Check authentication
         const token = localStorage.getItem('adminToken');
         const admin = JSON.parse(localStorage.getItem('admin') || '{}');
@@ -227,16 +243,16 @@
                             const isPending = app.status === 'pending' || app.status === 'under_review';
                             const isApproved = app.status === 'approved';
                             const actions = `
-                                ${isPending ? `<button class="btn btn-primary btn-sm mr-2" onclick="approveApplication('${app._id}')"><i class='fas fa-check'></i> Approve</button>` : ''}
-                                ${isPending ? `<button class="btn btn-danger btn-sm mr-2" onclick="rejectApplication('${app._id}')"><i class='fas fa-times'></i> Reject</button>` : ''}
-                                ${isApproved ? `<button class="btn btn-light btn-sm" onclick="activateApplication('${app._id}')"><i class='fas fa-play'></i> Activate</button>` : ''}
+                                ${isPending ? `<button class="btn btn-primary btn-sm mr-2" onclick="approveApplication('${safeMongoId(app._id)}')"><i class='fas fa-check'></i> Approve</button>` : ''}
+                                ${isPending ? `<button class="btn btn-danger btn-sm mr-2" onclick="rejectApplication('${safeMongoId(app._id)}')"><i class='fas fa-times'></i> Reject</button>` : ''}
+                                ${isApproved ? `<button class="btn btn-light btn-sm" onclick="activateApplication('${safeMongoId(app._id)}')"><i class='fas fa-play'></i> Activate</button>` : ''}
                             `;
                             return `
                             <tr>
-                                <td>${app.applicationNumber || app._id}</td>
-                                <td>${app.customerId.firstName} ${app.customerId.lastName}</td>
+                                <td>${escapeHtml(app.applicationNumber || app._id)}</td>
+                                <td>${escapeHtml(app.customerId?.firstName || '')} ${escapeHtml(app.customerId?.lastName || '')}</td>
                                 <td>₹${app.loanAmount.toLocaleString()}</td>
-                                <td><span class="badge badge-${app.status === 'pending' ? 'pending' : app.status === 'approved' ? 'approved' : app.status === 'rejected' ? 'rejected' : 'pending'}">${app.status}</span></td>
+                                <td><span class="badge badge-${applicationStatusClass(app.status)}">${escapeHtml(app.status)}</span></td>
                                 <td>${new Date(app.createdAt).toLocaleDateString()}</td>
                                 <td>${actions || '<span class="text-gray-400">No actions</span>'}</td>
                             </tr>`;
