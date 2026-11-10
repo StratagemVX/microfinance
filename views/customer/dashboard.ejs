@@ -322,6 +322,34 @@
     </div>
 
     <script>
+        // Escape untrusted values before inserting them into HTML templates.
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[character]);
+        }
+
+        function safeMongoId(value) {
+            const id = String(value ?? '');
+            return /^[a-f0-9]{24}$/i.test(id) ? id : '';
+        }
+
+        function loanStatusClass(status) {
+            const classes = {
+                approved: 'success',
+                pending: 'warning',
+                under_review: 'warning',
+                active: 'info',
+                rejected: 'danger',
+                closed: 'neutral'
+            };
+            return classes[String(status)] || 'neutral';
+        }
+
         // Check authentication
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -460,9 +488,9 @@
                             <tbody>
                                 ${data.data.slice(0, 5).map(loan => `
                                     <tr>
-                                        <td>${loan.loanId?.name || 'N/A'}</td>
+                                        <td>${escapeHtml(loan.loanId?.name || 'N/A')}</td>
                                         <td>₹${loan.loanAmount?.toLocaleString()}</td>
-                                        <td><span class="badge badge-${loan.status === 'approved' ? 'success' : loan.status === 'pending' ? 'warning' : loan.status === 'active' ? 'info' : 'neutral'}">${loan.status}</span></td>
+                                        <td><span class="badge badge-${loanStatusClass(loan.status)}">${escapeHtml(loan.status)}</span></td>
                                         <td>${new Date(loan.createdAt).toLocaleDateString()}</td>
                                     </tr>
                                 `).join('')}
@@ -564,16 +592,16 @@
                             <div class="mb-6 ${idx > 0 ? 'mt-8 pt-6 border-t-2 border-gray-200' : ''}">
                                 <h4 class="font-semibold text-slate-800 mb-3 flex items-center gap-2">
                                     <i class="fas fa-${app.loanId?.category === 'personal' ? 'user' : app.loanId?.category === 'business' ? 'briefcase' : 'graduation-cap'} text-indigo-600"></i>
-                                    ${app.loanId?.name || 'Loan'} - ${app.loanAmount?.toLocaleString()} ₹
+                                    ${escapeHtml(app.loanId?.name || 'Loan')} - ${app.loanAmount?.toLocaleString()} ₹
                                 </h4>
                                 <div class="application-timeline">
                                     ${steps.map(s => `
                                         <div class="timeline-item ${s.state}${s.isError ? ' error' : ''}">
                                             <div class="timeline-dot"><i class="fas ${s.icon}" style="color: ${s.isError ? '#ef4444' : ''}"></i></div>
                                             <div class="timeline-content">
-                                                <h4>${s.title}</h4>
-                                                ${s.date ? `<p class="text-sm text-gray-500">${s.date}</p>` : ''}
-                                                <p class="text-gray-600 text-sm">${s.note}</p>
+                                                <h4>${escapeHtml(s.title)}</h4>
+                                                ${s.date ? `<p class="text-sm text-gray-500">${escapeHtml(s.date)}</p>` : ''}
+                                                <p class="text-gray-600 text-sm">${escapeHtml(s.note)}</p>
                                             </div>
                                         </div>
                                     `).join('')}
@@ -606,17 +634,17 @@
                     const loansHtml = list.map(loan => `
                         <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
                             <div class="mb-4">
-                                <h3 class="font-bold text-lg mb-1">${loan.name}</h3>
-                                <span class="badge badge-primary">${loan.category}</span>
+                                <h3 class="font-bold text-lg mb-1">${escapeHtml(loan.name)}</h3>
+                                <span class="badge badge-primary">${escapeHtml(loan.category)}</span>
                             </div>
-                            <p class="text-sm text-gray-600 mb-4">${loan.description || 'No description'}</p>
+                            <p class="text-sm text-gray-600 mb-4">${escapeHtml(loan.description || 'No description')}</p>
                             <div class="space-y-2 mb-4">
                                 <p class="text-sm"><strong>Rate:</strong> ${loan.annualInterestRate}% p.a.</p>
                                 <p class="text-sm"><strong>Amount:</strong> ₹${loan.minAmount?.toLocaleString()} - ₹${loan.maxAmount?.toLocaleString()}</p>
                                 <p class="text-sm"><strong>Tenure:</strong> ${loan.minTenureMonths}-${loan.maxTenureMonths} months</p>
                                 <p class="text-xs text-gray-700"><strong>Eligibility:</strong> Min income ₹${(loan.minMonthlyIncome || 0).toLocaleString()} • Age ${loan.minAge || 0}-${loan.maxAge || 0} • Credit score ${loan.requiredCreditScore && loan.requiredCreditScore > 0 ? '≥ ' + loan.requiredCreditScore : 'not required'}</p>
                             </div>
-                            <button class="btn btn-primary w-full" onclick="applyForLoan('${loan._id}')">
+                            <button class="btn btn-primary w-full" onclick="applyForLoan('${safeMongoId(loan._id)}')">
                                 <i class="fas fa-check"></i> Apply Now
                             </button>
                         </div>
@@ -661,11 +689,11 @@
                                 <div class="card-ghost">
                                     <div class="flex justify-between items-start mb-4">
                                         <div>
-                                            <h3 class="text-lg font-bold">${loan.loanId?.name || 'Loan'}</h3>
-                                            <p class="text-sm text-gray-600">${loan.loanId?.category || ''}</p>
+                                            <h3 class="text-lg font-bold">${escapeHtml(loan.loanId?.name || 'Loan')}</h3>
+                                            <p class="text-sm text-gray-600">${escapeHtml(loan.loanId?.category || '')}</p>
                                         </div>
-                                        <span class="badge badge-${loan.status === 'approved' ? 'success' : loan.status === 'active' ? 'primary' : loan.status === 'rejected' ? 'danger' : 'warning'}">
-                                            ${loan.status}
+                                        <span class="badge badge-${loanStatusClass(loan.status)}">
+                                            ${escapeHtml(loan.status)}
                                         </span>
                                     </div>
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -726,10 +754,10 @@
                             ${window.availableLoans.map(loan => `
                                 <div class="card-ghost hover:shadow-xl transition-all">
                                     <div class="mb-4">
-                                        <h3 class="text-xl font-bold mb-2">${loan.name}</h3>
-                                        <span class="badge badge-primary">${loan.category}</span>
+                                        <h3 class="text-xl font-bold mb-2">${escapeHtml(loan.name)}</h3>
+                                        <span class="badge badge-primary">${escapeHtml(loan.category)}</span>
                                     </div>
-                                    <p class="text-sm text-gray-600 mb-4">${loan.description || 'Apply for this loan product'}</p>
+                                    <p class="text-sm text-gray-600 mb-4">${escapeHtml(loan.description || 'Apply for this loan product')}</p>
                                     <div class="space-y-2 mb-6">
                                         <div class="flex justify-between text-sm">
                                             <span class="text-gray-600">Interest Rate</span>
@@ -749,11 +777,11 @@
                                         </div>
                                         ${(loan.requirements && loan.requirements.length) ? `
                                         <ul class="mt-2 text-xs text-gray-600 list-disc pl-5">
-                                            ${loan.requirements.slice(0,3).map(req => `<li>${req}</li>`).join('')}
+                                            ${loan.requirements.slice(0,3).map(req => `<li>${escapeHtml(req)}</li>`).join('')}
                                         </ul>
                                         ` : ''}
                                     </div>
-                                    <button class="btn btn-primary w-full" onclick="startLoanApplicationFromId('${loan._id}')">
+                                    <button class="btn btn-primary w-full" onclick="startLoanApplicationFromId('${safeMongoId(loan._id)}')">
                                         <i class="fas fa-paper-plane"></i> Apply for This Loan
                                     </button>
                                 </div>
