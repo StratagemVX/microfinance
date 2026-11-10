@@ -22,6 +22,10 @@ const seedAdmins = async () => {
     console.log(`📊 Current admin count: ${adminCount}`);
 
     if (adminCount === 0) {
+      const missingCredentials = DEFAULT_ADMINS.filter((admin) => !admin.password || admin.password.length < 16);
+      if (missingCredentials.length > 0) {
+        throw new Error('Set all four SEED_*_PASSWORD environment variables (minimum 16 characters) before creating initial admin accounts.');
+      }
       console.log('📝 No admins found. Creating defaults...\n');
       for (const adminData of DEFAULT_ADMINS) {
         const exists = await Admin.findOne({ email: adminData.email });
