@@ -3,6 +3,12 @@
  * Provides toast notifications with multiple types and actions
  */
 
+function escapeNotificationHtml(value) {
+  return String(value ?? '').replace(/[&<>\"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;'
+  })[character]);
+}
+
 class NotificationManager {
   constructor() {
     this.notifications = [];
@@ -218,20 +224,23 @@ class NotificationManager {
   render(notification) {
     const notifEl = document.createElement('div');
     notifEl.id = notification.id;
-    notifEl.className = `notification notification-${notification.type}`;
+    const allowedTypes = new Set(['success', 'error', 'warning', 'info', 'loading', 'pending']);
+    const safeType = allowedTypes.has(notification.type) ? notification.type : 'info';
+    notifEl.className = `notification notification-${safeType}`;
     
     // Icon
     let iconHTML = '';
     if (notification.icon) {
       const isSpinner = notification.icon === 'fa-spinner';
-      iconHTML = `<i class="fas ${notification.icon} ${isSpinner ? 'spinning' : ''}"></i>`;
+      const safeIcon = /^fa-[a-z0-9-]+$/.test(notification.icon) ? notification.icon : 'fa-info-circle';
+      iconHTML = `<i class="fas ${safeIcon} ${isSpinner ? 'spinning' : ''}"></i>`;
     }
 
     // Actions
     let actionsHTML = '';
     if (notification.actions && notification.actions.length > 0) {
       const actionsStr = notification.actions
-        .map(action => `<button class="notification-action" data-action="${action.label}">${action.label}</button>`)
+        .map(action => { const label = escapeNotificationHtml(action.label); return `<button class="notification-action" data-action="${label}">${label}</button>`; })
         .join('');
       actionsHTML = `<div class="notification-actions">${actionsStr}</div>`;
     }
@@ -243,8 +252,8 @@ class NotificationManager {
       <div class="notification-content">
         ${iconHTML}
         <div class="notification-text">
-          <div class="notification-title">${notification.title}</div>
-          <div class="notification-message">${notification.message}</div>
+          <div class="notification-title">${escapeNotificationHtml(notification.title)}</div>
+          <div class="notification-message">${escapeNotificationHtml(notification.message)}</div>
           ${actionsHTML}
         </div>
       </div>
