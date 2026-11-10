@@ -1,6 +1,6 @@
 # Micro Finance Management System — Full-Stack Loan Origination & Client Banking Portal
 
-> A comprehensive banking workflow engine digitizing microcredit operations, borrower risk underwriting, automated amortization schedules, and transactional notifications.
+> A Node.js/Express and MongoDB application for loan applications, staff review workflows, customer profiles, KYC, and repayment-related views. Validate deployment readiness, data protection, and financial calculations before production use.
 
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-4.x-black.svg)](https://expressjs.com/)
@@ -76,9 +76,15 @@ cp .env.example .env
 # Start application server
 npm start
 ```
-Default application port: `http://localhost:3000`
+Default application port: `http://localhost:5000` (override with `PORT`).
 
 ---
+
+## Environment & First-Run Setup
+
+The server requires `MONGODB_URI` and `APP_BASE_URL`. Set `JWT_SECRET` to a unique high-entropy value and configure `JWT_EXPIRY` and `PORT` as needed. Copy `.env.example` to `.env` and replace every placeholder locally; never commit the populated file.
+
+The `npm run seed:admin` command creates initial staff accounts only when the database has none. The security remediation requires four distinct `SEED_*_PASSWORD` variables (minimum 16 characters) at seed time. Provision them through trusted environment secrets; do not put them in the repository or shell history. There is no `test` or `lint` script in the current `package.json`, and no lockfile is checked in, so dependency and automated test coverage are incomplete.
 
 ## Contributor Attribution & Profile
 
