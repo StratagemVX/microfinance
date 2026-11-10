@@ -21,13 +21,16 @@ mongod
 ## 2️⃣ Seed Database (Required)
 
 ```bash
-# Creates default admin account and loan products
-node server/utils/seedAdmin.js
-```
+# Provision unique credentials in the deployment environment before running:
+# SEED_SUPER_ADMIN_PASSWORD
+# SEED_LOAN_OFFICER_PASSWORD
+# SEED_COMPLIANCE_OFFICER_PASSWORD
+# SEED_CUSTOMER_SERVICE_PASSWORD
+npm run seed:admin
 
-**Default Admin Login:**
-- Email: `admin@microfinance.com`
-- Password: `Admin@123456`
+# The seeder refuses to create accounts unless all four values are set
+# and each is at least 16 characters. It does not print the passwords.
+```
 
 ## 3️⃣ Start Server
 
@@ -66,7 +69,7 @@ You should see the Micro Finance homepage with Customer/Admin login options.
 - Submit → See ETA & next steps
 
 ### 4. Admin Actions
-- Login as admin (admin@microfinance.com / Admin@123456)
+- Sign in with an administrator account provisioned through the trusted seed environment or an existing admin invitation.
 - See pending applications
 - Click Approve/Reject/Activate buttons
 - Observe toast notifications with guidance
