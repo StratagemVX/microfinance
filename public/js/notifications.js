@@ -3,6 +3,12 @@
  * Provides toast notifications with multiple types and actions
  */
 
+function escapeNotificationHtml(value) {
+  return String(value ?? '').replace(/[&<>\"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;'
+  })[character]);
+}
+
 class NotificationManager {
   constructor() {
     this.notifications = [];
@@ -218,20 +224,23 @@ class NotificationManager {
   render(notification) {
     const notifEl = document.createElement('div');
     notifEl.id = notification.id;
-    notifEl.className = `notification notification-${notification.type}`;
+    const allowedTypes = new Set(['success', 'error', 'warning', 'info', 'loading', 'pending', 'progress']);
+    const safeType = allowedTypes.has(notification.type) ? notification.type : 'info';
+    notifEl.className = `notification notification-${safeType}`;
     
     // Icon
     let iconHTML = '';
     if (notification.icon) {
       const isSpinner = notification.icon === 'fa-spinner';
-      iconHTML = `<i class="fas ${notification.icon} ${isSpinner ? 'spinning' : ''}"></i>`;
+      const safeIcon = /^fa-[a-z0-9-]+$/.test(notification.icon) ? notification.icon : 'fa-info-circle';
+      iconHTML = `<i class="fas ${safeIcon} ${isSpinner ? 'spinning' : ''}"></i>`;
     }
 
     // Actions
     let actionsHTML = '';
     if (notification.actions && notification.actions.length > 0) {
       const actionsStr = notification.actions
-        .map(action => `<button class="notification-action" data-action="${action.label}">${action.label}</button>`)
+        .map(action => { const label = escapeNotificationHtml(action.label); return `<button class="notification-action" data-action="${label}">${label}</button>`; })
         .join('');
       actionsHTML = `<div class="notification-actions">${actionsStr}</div>`;
     }
@@ -239,12 +248,21 @@ class NotificationManager {
     // Close button
     const closeHTML = `<button class="notification-close" aria-label="Close notification">&times;</button>`;
 
+    // Progress UI is generated only from a bounded numeric percentage and escaped text.
+    const hasProgress = Number.isFinite(notification.progressPercentage);
+    const progressPercentage = hasProgress
+      ? Math.max(0, Math.min(100, Math.round(notification.progressPercentage)))
+      : null;
+    const messageHTML = hasProgress
+      ? `<div class="progress-bar"><div class="progress-fill" style="width: ${progressPercentage}%"></div></div><div class="progress-text">${escapeNotificationHtml(notification.message)} (${progressPercentage}%)</div>`
+      : `<div class="notification-message">${escapeNotificationHtml(notification.message)}</div>`;
+
     notifEl.innerHTML = `
       <div class="notification-content">
         ${iconHTML}
         <div class="notification-text">
-          <div class="notification-title">${notification.title}</div>
-          <div class="notification-message">${notification.message}</div>
+          <div class="notification-title">${escapeNotificationHtml(notification.title)}</div>
+          ${messageHTML}
           ${actionsHTML}
         </div>
       </div>
@@ -302,12 +320,8 @@ class NotificationManager {
     return this.show({
       type: 'progress',
       title,
-      message: `
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${percentage}%"></div>
-        </div>
-        <div class="progress-text">${message} (${percentage}%)</div>
-      `,
+      message: String(message ?? ''),
+      progressPercentage: Number.isFinite(Number(percentage)) ? Number(percentage) : 0,
       duration: 0
     });
   }
@@ -324,11 +338,14 @@ class NotificationManager {
       const progressFill = notifEl.querySelector('.progress-fill');
       const progressText = notifEl.querySelector('.progress-text');
       
+      const safePercentage = Number.isFinite(Number(percentage))
+        ? Math.max(0, Math.min(100, Math.round(Number(percentage))))
+        : 0;
       if (progressFill) {
-        progressFill.style.width = percentage + '%';
+        progressFill.style.width = safePercentage + '%';
       }
       if (progressText) {
-        progressText.textContent = `${message} (${percentage}%)`;
+        progressText.textContent = `${String(message ?? '')} (${safePercentage}%)`;
       }
     }
   }
