@@ -7,10 +7,10 @@ const { connectDB, disconnectDB } = require('../config/db');
 const Admin = require('../models/Admin');
 
 const DEFAULT_ADMINS = [
-  { firstName: 'Super', lastName: 'Admin', email: 'admin@microfinance.com', phone: '9876543210', password: 'Admin@123456', role: 'super_admin', department: 'management', accountStatus: 'active' },
-  { firstName: 'Loan', lastName: 'Officer', email: 'loanofficer@microfinance.com', phone: '9876543211', password: 'Loan@123456', role: 'loan_officer', department: 'loan_management', accountStatus: 'active' },
-  { firstName: 'KYC', lastName: 'Verification', email: 'kyc@microfinance.com', phone: '9876543212', password: 'KYC@123456', role: 'compliance_officer', department: 'kyc_verification', accountStatus: 'active' },
-  { firstName: 'Customer', lastName: 'Service', email: 'support@microfinance.com', phone: '9876543213', password: 'Support@123456', role: 'customer_service', department: 'customer_support', accountStatus: 'active' }
+  { firstName: 'Super', lastName: 'Admin', email: 'admin@microfinance.com', phone: '9876543210', password: process.env.SEED_SUPER_ADMIN_PASSWORD, role: 'super_admin', department: 'management', accountStatus: 'active' },
+  { firstName: 'Loan', lastName: 'Officer', email: 'loanofficer@microfinance.com', phone: '9876543211', password: process.env.SEED_LOAN_OFFICER_PASSWORD, role: 'loan_officer', department: 'loan_management', accountStatus: 'active' },
+  { firstName: 'KYC', lastName: 'Verification', email: 'kyc@microfinance.com', phone: '9876543212', password: process.env.SEED_COMPLIANCE_OFFICER_PASSWORD, role: 'compliance_officer', department: 'kyc_verification', accountStatus: 'active' },
+  { firstName: 'Customer', lastName: 'Service', email: 'support@microfinance.com', phone: '9876543213', password: process.env.SEED_CUSTOMER_SERVICE_PASSWORD, role: 'customer_service', department: 'customer_support', accountStatus: 'active' }
 ];
 
 const seedAdmins = async () => {
@@ -30,7 +30,7 @@ const seedAdmins = async () => {
           continue;
         }
         const admin = await Admin.create(adminData);
-        console.log(`✅ Created: ${admin.email} (${admin.role}) | Password: ${adminData.password}`);
+        console.log(`✅ Created: ${admin.email} (${admin.role})`);
       }
     } else {
       console.log('\n✅ Admins already exist. Listing:');
