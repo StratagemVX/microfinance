@@ -224,7 +224,7 @@ class NotificationManager {
   render(notification) {
     const notifEl = document.createElement('div');
     notifEl.id = notification.id;
-    const allowedTypes = new Set(['success', 'error', 'warning', 'info', 'loading', 'pending']);
+    const allowedTypes = new Set(['success', 'error', 'warning', 'info', 'loading', 'pending', 'progress']);
     const safeType = allowedTypes.has(notification.type) ? notification.type : 'info';
     notifEl.className = `notification notification-${safeType}`;
     
@@ -248,12 +248,21 @@ class NotificationManager {
     // Close button
     const closeHTML = `<button class="notification-close" aria-label="Close notification">&times;</button>`;
 
+    // Progress UI is generated only from a bounded numeric percentage and escaped text.
+    const hasProgress = Number.isFinite(notification.progressPercentage);
+    const progressPercentage = hasProgress
+      ? Math.max(0, Math.min(100, Math.round(notification.progressPercentage)))
+      : null;
+    const messageHTML = hasProgress
+      ? `<div class="progress-bar"><div class="progress-fill" style="width: ${progressPercentage}%"></div></div><div class="progress-text">${escapeNotificationHtml(notification.message)} (${progressPercentage}%)</div>`
+      : `<div class="notification-message">${escapeNotificationHtml(notification.message)}</div>`;
+
     notifEl.innerHTML = `
       <div class="notification-content">
         ${iconHTML}
         <div class="notification-text">
           <div class="notification-title">${escapeNotificationHtml(notification.title)}</div>
-          <div class="notification-message">${escapeNotificationHtml(notification.message)}</div>
+          ${messageHTML}
           ${actionsHTML}
         </div>
       </div>
@@ -311,12 +320,8 @@ class NotificationManager {
     return this.show({
       type: 'progress',
       title,
-      message: `
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: ${percentage}%"></div>
-        </div>
-        <div class="progress-text">${message} (${percentage}%)</div>
-      `,
+      message: String(message ?? ''),
+      progressPercentage: Number.isFinite(Number(percentage)) ? Number(percentage) : 0,
       duration: 0
     });
   }
@@ -333,11 +338,14 @@ class NotificationManager {
       const progressFill = notifEl.querySelector('.progress-fill');
       const progressText = notifEl.querySelector('.progress-text');
       
+      const safePercentage = Number.isFinite(Number(percentage))
+        ? Math.max(0, Math.min(100, Math.round(Number(percentage))))
+        : 0;
       if (progressFill) {
-        progressFill.style.width = percentage + '%';
+        progressFill.style.width = safePercentage + '%';
       }
       if (progressText) {
-        progressText.textContent = `${message} (${percentage}%)`;
+        progressText.textContent = `${String(message ?? '')} (${safePercentage}%)`;
       }
     }
   }
