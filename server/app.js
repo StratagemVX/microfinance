@@ -5,6 +5,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const path = require('path');
 const { errorHandler } = require('./middleware/errorMiddleware');
@@ -32,7 +33,44 @@ app.use(helmet({
     }
   }
 }));
-app.use(cors()); // Enable CORS
+app.disable('x-powered-by');
+app.set('query parser', 'simple');
+
+const parseAllowedOrigins = () => {
+  const configured = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  if (configured.length > 0) return configured;
+  if (process.env.APP_BASE_URL) {
+    return [process.env.APP_BASE_URL.trim().replace(/\/$/, '')];
+  }
+  return process.env.NODE_ENV === 'production'
+    ? []
+    : ['http://localhost:5000', 'http://127.0.0.1:5000'];
+};
+
+const allowedCorsOrigins = new Set(parseAllowedOrigins());
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedCorsOrigins.has(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS origin not allowed'));
+  },
+  credentials: true,
+}));
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many authentication attempts. Please try again later.' },
+});
+
+app.use('/api/auth', authLimiter);
 
 // Body Parser Middleware
 app.use(express.json({ limit: '10mb' }));

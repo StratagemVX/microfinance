@@ -26,10 +26,10 @@ const getAllLoans = async (req, res) => {
       data: loans,
     });
   } catch (error) {
+    console.error('Failed to fetch loans:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch loans',
-      error: error.message,
     });
   }
 };
@@ -56,10 +56,10 @@ const getLoanById = async (req, res) => {
       data: loan,
     });
   } catch (error) {
+    console.error('Failed to fetch loan:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch loan',
-      error: error.message,
     });
   }
 };
@@ -127,13 +127,30 @@ const createLoan = async (req, res) => {
       data: loan,
     });
   } catch (error) {
+    console.error('Failed to create loan:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to create loan',
-      error: error.message,
     });
   }
 };
+
+const ALLOWED_LOAN_UPDATE_FIELDS = [
+  'name',
+  'description',
+  'category',
+  'minAmount',
+  'maxAmount',
+  'minTenureMonths',
+  'maxTenureMonths',
+  'annualInterestRate',
+  'minMonthlyIncome',
+  'maxAge',
+  'minAge',
+  'features',
+  'requirements',
+  'isActive',
+];
 
 /**
  * PUT /api/loans/:id
@@ -142,7 +159,21 @@ const createLoan = async (req, res) => {
  */
 const updateLoan = async (req, res) => {
   try {
-    const loan = await Loan.findByIdAndUpdate(req.params.id, req.body, {
+    const updates = {};
+    for (const field of ALLOWED_LOAN_UPDATE_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(req.body || {}, field)) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid loan fields supplied for update',
+      });
+    }
+
+    const loan = await Loan.findByIdAndUpdate(req.params.id, updates, {
       new: true,
       runValidators: true,
     });
@@ -160,10 +191,10 @@ const updateLoan = async (req, res) => {
       data: loan,
     });
   } catch (error) {
+    console.error('Failed to update loan:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to update loan',
-      error: error.message,
     });
   }
 };
@@ -258,22 +289,30 @@ const applyForLoan = async (req, res) => {
         : 'Application submitted • Under review',
     });
   } catch (error) {
+    console.error('Failed to apply for loan:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to apply for loan',
-      error: error.message,
     });
   }
 };
 
 /**
- * GET /api/loans/applications/:customerId
+ * GET /api/loans/customer/:customerId
  * Get customer's loan applications
- * Protected: Customer or Admin
+ * Protected: Owner Customer or Admin
  */
 const getCustomerApplications = async (req, res) => {
   try {
     const { customerId } = req.params;
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isOwner = req.user && String(req.user.id) === String(customerId);
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You may only inspect your own loan applications.',
+      });
+    }
 
     const applications = await LoanApplication.find({ customerId })
       .populate('loanId', 'name category')
@@ -286,10 +325,10 @@ const getCustomerApplications = async (req, res) => {
       data: applications,
     });
   } catch (error) {
+    console.error('Failed to fetch applications:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch applications',
-      error: error.message,
     });
   }
 };
@@ -297,6 +336,7 @@ const getCustomerApplications = async (req, res) => {
 /**
  * GET /api/loans/application/:applicationId
  * Get loan application details
+ * Protected: Owner Customer or Admin
  */
 const getApplicationDetails = async (req, res) => {
   try {
@@ -312,16 +352,28 @@ const getApplicationDetails = async (req, res) => {
       });
     }
 
+    const ownerId = application.customerId && application.customerId._id
+      ? application.customerId._id
+      : application.customerId;
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isOwner = req.user && ownerId && String(ownerId) === String(req.user.id);
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You may only inspect your own loan application.',
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: 'Application details retrieved',
       data: application,
     });
   } catch (error) {
+    console.error('Failed to fetch application:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch application',
-      error: error.message,
     });
   }
 };

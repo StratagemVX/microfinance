@@ -70,9 +70,12 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // Default Error
-  res.status(err.status || 500).json({
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({
     success: false,
-    message: err.message || 'Something went wrong. Please try again later.',
+    message: statusCode < 500
+      ? (err.message || 'Request failed.')
+      : 'Something went wrong. Please try again later.',
   });
 };
 

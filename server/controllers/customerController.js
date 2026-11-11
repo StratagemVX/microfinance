@@ -28,10 +28,10 @@ const getProfile = async (req, res) => {
       data: customer.getPublicProfile(),
     });
   } catch (error) {
+    console.error('Failed to fetch profile:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch profile',
-      error: error.message,
     });
   }
 };
@@ -76,10 +76,10 @@ const updateProfile = async (req, res) => {
       data: customer.getPublicProfile(),
     });
   } catch (error) {
+    console.error('Failed to update profile:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to update profile',
-      error: error.message,
     });
   }
 };
@@ -105,10 +105,10 @@ const getMyLoans = async (req, res) => {
       data: loans,
     });
   } catch (error) {
+    console.error('Failed to fetch loans:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch loans',
-      error: error.message,
     });
   }
 };
@@ -120,7 +120,14 @@ const getMyLoans = async (req, res) => {
  */
 const getDashboard = async (req, res) => {
   try {
+    const mongoose = require('mongoose');
     const customer = await Customer.findById(req.user.id);
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: 'Customer not found',
+      });
+    }
 
     // Get statistics
     const totalApplications = await LoanApplication.countDocuments({
@@ -138,7 +145,7 @@ const getDashboard = async (req, res) => {
     });
 
     const totalBorrowed = await LoanApplication.aggregate([
-      { $match: { customerId: require('mongoose').Types.ObjectId(req.user.id) } },
+      { $match: { customerId: new mongoose.Types.ObjectId(req.user.id) } },
       { $group: { _id: null, total: { $sum: '$loanAmount' } } },
     ]);
 
@@ -156,10 +163,10 @@ const getDashboard = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Failed to fetch dashboard data:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch dashboard data',
-      error: error.message,
     });
   }
 };
@@ -197,10 +204,10 @@ const submitKYC = async (req, res) => {
       data: customer.getPublicProfile(),
     });
   } catch (error) {
+    console.error('Failed to submit KYC:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to submit KYC',
-      error: error.message,
     });
   }
 };

@@ -6,6 +6,14 @@
 
 const jwt = require('jsonwebtoken');
 
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || typeof secret !== 'string' || !secret.trim()) {
+    throw new Error('JWT_SECRET environment variable is not configured.');
+  }
+  return secret;
+};
+
 /**
  * Verify JWT token and extract user information
  * @param {object} req - Express request object
@@ -24,8 +32,16 @@ const verifyToken = (req, res, next) => {
       });
     }
 
+    const secret = process.env.JWT_SECRET;
+    if (!secret || typeof secret !== 'string' || !secret.trim()) {
+      return res.status(500).json({
+        success: false,
+        message: 'Server authentication configuration error.',
+      });
+    }
+
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (error) {
@@ -95,6 +111,7 @@ const verifyAdmin = (req, res, next) => {
 };
 
 module.exports = {
+  getJwtSecret,
   verifyToken,
   verifyCustomer,
   verifyAdmin,

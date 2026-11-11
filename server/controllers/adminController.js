@@ -91,12 +91,29 @@ const getDashboard = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Failed to fetch dashboard:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch dashboard',
-      error: error.message,
     });
   }
+};
+
+const ALLOWED_KYC_STATUSES = new Set(['pending', 'verified', 'rejected']);
+const ALLOWED_ACCOUNT_STATUSES = new Set(['active', 'inactive', 'suspended']);
+const ALLOWED_APPLICATION_STATUSES = new Set([
+  'pending',
+  'under_review',
+  'approved',
+  'rejected',
+  'active',
+  'closed',
+]);
+
+const parsePagination = (rawPage, rawLimit) => {
+  const pageNum = Math.max(1, parseInt(rawPage, 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(rawLimit, 10) || 10));
+  return { pageNum, limitNum, skip: (pageNum - 1) * limitNum };
 };
 
 /**
@@ -108,16 +125,24 @@ const getAllCustomers = async (req, res) => {
   try {
     const { kycStatus, accountStatus, page = 1, limit = 10 } = req.query;
 
-    let filter = {};
-    if (kycStatus) filter.kycStatus = kycStatus;
-    if (accountStatus) filter.accountStatus = accountStatus;
+    const filter = {};
+    if (typeof kycStatus === 'string' && ALLOWED_KYC_STATUSES.has(kycStatus)) {
+      filter.kycStatus = kycStatus;
+    } else if (kycStatus !== undefined && kycStatus !== '') {
+      return res.status(400).json({ success: false, message: 'Invalid kycStatus filter' });
+    }
+    if (typeof accountStatus === 'string' && ALLOWED_ACCOUNT_STATUSES.has(accountStatus)) {
+      filter.accountStatus = accountStatus;
+    } else if (accountStatus !== undefined && accountStatus !== '') {
+      return res.status(400).json({ success: false, message: 'Invalid accountStatus filter' });
+    }
 
-    const skip = (page - 1) * limit;
+    const { pageNum, limitNum, skip } = parsePagination(page, limit);
 
     const customers = await Customer.find(filter)
       .select('-password')
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(limitNum)
       .sort({ createdAt: -1 });
 
     const total = await Customer.countDocuments(filter);
@@ -127,16 +152,16 @@ const getAllCustomers = async (req, res) => {
       message: 'Customers retrieved',
       pagination: {
         total,
-        page: parseInt(page),
-        pages: Math.ceil(total / limit),
+        page: pageNum,
+        pages: Math.ceil(total / limitNum),
       },
       data: customers,
     });
   } catch (error) {
+    console.error('Failed to fetch customers:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch customers',
-      error: error.message,
     });
   }
 };
@@ -170,10 +195,10 @@ const getCustomerDetails = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('Failed to fetch customer details:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch customer details',
-      error: error.message,
     });
   }
 };
@@ -217,10 +242,10 @@ const verifyKYC = async (req, res) => {
       data: customer.getPublicProfile(),
     });
   } catch (error) {
+    console.error('Failed to verify KYC:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to verify KYC',
-      error: error.message,
     });
   }
 };
@@ -234,16 +259,20 @@ const getAllApplications = async (req, res) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;
 
-    let filter = {};
-    if (status) filter.status = status;
+    const filter = {};
+    if (typeof status === 'string' && ALLOWED_APPLICATION_STATUSES.has(status)) {
+      filter.status = status;
+    } else if (status !== undefined && status !== '') {
+      return res.status(400).json({ success: false, message: 'Invalid status filter' });
+    }
 
-    const skip = (page - 1) * limit;
+    const { pageNum, limitNum, skip } = parsePagination(page, limit);
 
     const applications = await LoanApplication.find(filter)
       .populate('customerId', 'firstName lastName email phone')
       .populate('loanId', 'name category')
       .skip(skip)
-      .limit(parseInt(limit))
+      .limit(limitNum)
       .sort({ createdAt: -1 });
 
     const total = await LoanApplication.countDocuments(filter);
@@ -253,16 +282,16 @@ const getAllApplications = async (req, res) => {
       message: 'Applications retrieved',
       pagination: {
         total,
-        page: parseInt(page),
-        pages: Math.ceil(total / limit),
+        page: pageNum,
+        pages: Math.ceil(total / limitNum),
       },
       data: applications,
     });
   } catch (error) {
+    console.error('Failed to fetch applications:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to fetch applications',
-      error: error.message,
     });
   }
 };
@@ -308,10 +337,10 @@ const approveLoanApplication = async (req, res) => {
       nextSteps: ['Activate the loan to start the EMI schedule', 'Complete customer KYC if not already done'],
     });
   } catch (error) {
+    console.error('Failed to approve application:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to approve application',
-      error: error.message,
     });
   }
 };
@@ -364,10 +393,10 @@ const rejectLoanApplication = async (req, res) => {
       nextSteps: ['Notify customer of rejection', 'Send reapply instructions for 30 days later'],
     });
   } catch (error) {
+    console.error('Failed to reject application:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to reject application',
-      error: error.message,
     });
   }
 };
@@ -406,10 +435,10 @@ const activateLoan = async (req, res) => {
       nextSteps: ['Send repayment schedule to customer', 'Enable EMI payment gateway', 'Send welcome message with first EMI date'],
     });
   } catch (error) {
+    console.error('Failed to activate loan:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to activate loan',
-      error: error.message,
     });
   }
 };
