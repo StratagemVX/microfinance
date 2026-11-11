@@ -1,45 +1,40 @@
-# Micro Finance Management System — Full-Stack Loan Origination & Client Banking Portal
+# Micro Finance Management System — Loan Origination & Banking Portal
 
-> A comprehensive banking workflow engine digitizing microcredit operations, borrower risk underwriting, automated amortization schedules, and transactional notifications.
+> Full-stack Node.js, Express, MongoDB/Mongoose, and EJS web platform for loan applications, KYC onboarding, credit officer underwriting, repayment scheduling, and email alerts.
 
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-green.svg)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-4.x-black.svg)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248.svg)](https://www.mongodb.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248.svg)](https://www.mongodb.com/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3.svg)](https://getbootstrap.com/)
 
 ---
 
 ## Executive Overview
 
-Micro Finance Management System is an end-to-end financial operations platform engineered to digitize small-loan origination and credit servicing for community development financial institutions (CDFIs) and underserved micro-entrepreneurs. The system automates the complete credit lifecycle: client onboarding, KYC profile verification, loan eligibility calculation, multi-stage approval workflows, installment repayment scheduling, and automated email receipts.
+**Micro Finance Management System** (`microfinance`) digitizes micro-lending workflows including customer onboarding, KYC verification, loan eligibility and amortization calculation, staff/admin credit review, repayment tracking, and Nodemailer SMTP notifications.
+
+> **Open Security Remediation Pull Requests (`main` vs. PRs #1, #3, #4):**
+> - **PR #1 (`security/remove-seeded-passwords`, Draft):** Removes source-controlled default staff passwords and enforces >=16-character `SEED_*_PASSWORD` environment variables during initial seeding; hardens password reset tokens, auth rate limiting, and IDOR access guards; commits `package-lock.json` and updates `express-rate-limit` / `nodemailer`; adds `npm test` (`tests/security-hardening.test.js`) and `.github/workflows/quality.yml` (verified passing in CI with 9/9 Node tests, 0 high/critical `npm audit` findings, syntax check, and EJS template compilation).
+> - **PR #3 (`security/notification-xss`, Draft):** Escapes dynamic HTML rendered inside client notification feeds (`public/js/notifications.js`).
+> - **PR #4 (`security/dashboard-html-escaping`, Draft):** Escapes dynamic HTML content rendered across loan dashboard views.
 
 ---
 
-## Core Capabilities & Features
+## Core Capabilities & Architecture
 
-### Implemented Features
-- **Borrower Self-Service Portal:** Transparent loan application forms, instant amortization calculators, and real-time application tracking.
-- **Credit Officer & Admin Review Dashboard:** Risk profile evaluation, credit limit adjustment, and approval/rejection decision workflows.
-- **Amortization & Repayment Scheduling:** Generates principal and interest breakdowns with due-date compliance matrices.
-- **Transactional Notification Engine:** Robust SMTP email delivery via Nodemailer sending disbursement receipts and due-date alerts.
-- **Relational Data Modeling with Mongoose:** Clean schema separation across Client Profiles, Loan Accounts, Payment Ledgers, and System Audit Logs.
-
----
-
-## System Architecture
+### Implemented Capabilities
+- **Borrower Portal:** Loan application flows, customer profiles, repayment breakdowns, and status views rendered via EJS + Bootstrap 5.
+- **Staff / Admin Underwriting:** Multi-role credit review and approval/rejection workflows (`server/controllers/adminController.js`, `loanController.js`, `customerController.js`, `authController.js`).
+- **Mongoose Persistence:** Models for users/staff, customers, loan products, loan applications, repayments, and notifications.
+- **Transactional Emails:** Nodemailer SMTP notifications for status changes and password recovery workflows.
 
 ```mermaid
 flowchart TD
-    Client([Borrower / Client]):::user -->|Apply for Microloan| Portal[Web UI - EJS & Bootstrap 5]
-    Officer([Credit Officer / Admin]):::staff -->|Underwrite / Approve| Portal
-    Portal --> Server[Node.js / Express Server]
-    Server --> Auth[Session & Role Authentication]
-    Server --> DB[(MongoDB / Mongoose ODM)]
-    Server --> Mailer[Nodemailer SMTP Service]
-    Mailer -->|Disbursement Receipt Email| Client
-
-    classDef user fill:#2563eb,stroke:#1d4ed8,color:#fff;
-    classDef staff fill:#7c3aed,stroke:#6d28d9,color:#fff;
+    Borrower([Borrower / Client]) -->|EJS + Bootstrap UI| Express[Express Server - server/app.js]
+    Staff([Credit Officer / Admin]) -->|Review & Disburse| Express
+    Express --> Auth[JWT & Role Middleware - server/middleware/authMiddleware.js]
+    Express --> Mongo[(MongoDB via Mongoose - server/config/db.js)]
+    Express --> SMTP[Nodemailer SMTP]
 ```
 
 ---
@@ -48,42 +43,75 @@ flowchart TD
 
 ```text
 microfinance/
-├── public/                  # CSS stylesheets, client-side validation scripts
-├── views/                   # EJS templates (loan application, admin portal, receipts)
-├── routes/                  # Express controllers for loans, auth, and clients
-├── models/                  # Mongoose schemas (Client, Loan, Payment, User)
-├── config/                  # Database connectivity and mailer configuration
-├── .env.example             # Clean environment variable specification
-├── package.json             # Node dependencies and execution scripts
-└── README.md                # Master repository technical documentation
+├── .github/workflows/quality.yml   # npm ci --ignore-scripts, npm audit, tests, syntax & EJS compile (PR #1)
+├── public/
+│   ├── css/                        # style.css, feedback.css
+│   └── js/                         # main.js, notifications.js, registration-validation.js
+├── server/
+│   ├── config/db.js                # MongoDB connection
+│   ├── controllers/                # admin, auth, customer, loan controllers
+│   ├── middleware/authMiddleware.js
+│   ├── models/                     # Mongoose schemas
+│   ├── routes/                     # Express routes
+│   ├── utils/                      # seedAdmin.js, seedLoans.js, mail helpers
+│   ├── app.js                      # Express app setup
+│   └── server.js                   # Server entrypoint
+├── tests/
+│   └── security-hardening.test.js  # Node test suite (PR #1)
+├── views/                          # EJS templates
+├── .env.example                    # Placeholder environment configuration
+├── package-lock.json               # Committed dependency lockfile (PR #1)
+├── package.json
+└── README.md
 ```
 
 ---
 
-## Setup & Installation
+## Setup, Environment & Verification
 
+### Installation & First Run
 ```bash
-# Clone the repository
 git clone https://github.com/StratagemVX/microfinance.git
 cd microfinance
 
-# Install dependencies
-npm install
-
-# Configure environment variables
+npm ci --ignore-scripts
 cp .env.example .env
-
-# Start application server
+# Populate .env with your MongoDB URI, unique JWT_SECRET, and deployment settings
 npm start
 ```
-Default application port: `http://localhost:3000`
+Default port: `5000` (`PORT` in `.env`).
+
+### Environment Variables (`.env.example`)
+| Variable | Purpose |
+|---|---|
+| `MONGODB_URI` | MongoDB connection string |
+| `APP_BASE_URL` | Public base URL used for password-reset links |
+| `JWT_SECRET` | High-entropy JWT signing secret |
+| `JWT_EXPIRY` | Token lifetime (e.g., `7d`) |
+| `PORT`, `NODE_ENV` | Express server port (`5000`) & runtime mode |
+| `SEED_SUPER_ADMIN_PASSWORD`, `SEED_LOAN_OFFICER_PASSWORD`, `SEED_COMPLIANCE_OFFICER_PASSWORD`, `SEED_CUSTOMER_SERVICE_PASSWORD` | Required >=16-char unique passwords when running `npm run seed:admin` against an empty database (enforced in PR #1) |
+
+### Available Package Scripts (`package.json`)
+| Script | Command | Notes |
+|---|---|---|
+| `npm start` | `node server/server.js` | Production server start |
+| `npm run dev` | `nodemon server/server.js` | Development auto-reload server |
+| `npm run seed:admin` | `node server/utils/seedAdmin.js` | Seed initial staff accounts when DB has none |
+| `npm run seed:loans` | `node server/utils/seedLoans.js` | Seed loan product definitions |
+| `npm test` | `node --test tests/*.test.js` | Security & functional tests (added in PR #1) |
+
+---
+
+## Additional Repository Documentation
+
+- [QUICKSTART.md](QUICKSTART.md), [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md), [LOAN_PRODUCTS_DETAILS.md](LOAN_PRODUCTS_DETAILS.md)
+- [README_EMAIL.md](README_EMAIL.md), [README_FORGOT_PASSWORD.md](README_FORGOT_PASSWORD.md), [TROUBLESHOOTING_EMAIL.md](TROUBLESHOOTING_EMAIL.md)
 
 ---
 
 ## Contributor Attribution & Profile
 
 - **Lead Engineer:** Chethan Kumar B S (`StratagemVX`)
-- **Institution:** Department of Computer Science & Engineering, MVJ College of Engineering
 - **GitHub:** [https://github.com/StratagemVX](https://github.com/StratagemVX)
 - **Portfolio:** [https://chethan-kumar-portfolio.vercel.app/](https://chethan-kumar-portfolio.vercel.app/)
 - **LinkedIn:** [https://linkedin.com/in/chethan-kumar-b-s-781a002bb](https://linkedin.com/in/chethan-kumar-b-s-781a002bb)
