@@ -32,6 +32,9 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+      - name: Audit full dependency tree (including devDependencies)
+        run: npm audit --audit-level=moderate
+
       - name: Run automated security and functional tests
         run: npm test
 
