@@ -31,8 +31,8 @@ router.post(
       .matches(/^[0-9]{10}$/)
       .withMessage('Phone must be 10 digits'),
     body('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters'),
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
     body('street').trim().notEmpty().withMessage('Street address is required'),
     body('city').trim().notEmpty().withMessage('City is required'),
     body('state').trim().notEmpty().withMessage('State is required'),
@@ -98,8 +98,8 @@ router.post(
       .matches(/^[0-9]{10}$/)
       .withMessage('Phone must be 10 digits'),
     body('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters'),
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
     body('role')
       .isIn(['super_admin', 'loan_officer', 'customer_service', 'compliance_officer'])
       .withMessage('Invalid role'),
@@ -131,8 +131,8 @@ router.post(
   [
     body('token').notEmpty().withMessage('Reset token is required'),
     body('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters'),
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
     body('confirmPassword').notEmpty().withMessage('Confirm password is required'),
   ],
   authController.customerResetPassword
@@ -159,8 +159,8 @@ router.post(
   [
     body('token').notEmpty().withMessage('Reset token is required'),
     body('password')
-      .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters'),
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters'),
     body('confirmPassword').notEmpty().withMessage('Confirm password is required'),
   ],
   authController.adminResetPassword

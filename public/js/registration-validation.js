@@ -94,13 +94,16 @@ function showPasswordRequirements(password) {
   if (missing.length > 0) {
     const helperText = document.querySelector('[for="password"] + .password-strength-meter + .helper-text');
     if (helperText) {
-      helperText.innerHTML = `<strong>Missing:</strong> ${missing.join(', ')}`;
+      helperText.textContent = '';
+      const label = document.createElement('strong');
+      label.textContent = 'Missing: ';
+      helperText.append(label, document.createTextNode(missing.join(', ')));
       helperText.style.color = '#ef4444';
     }
   } else {
     const helperText = document.querySelector('[for="password"] + .password-strength-meter + .helper-text');
     if (helperText) {
-      helperText.innerHTML = '✓ Password meets all requirements';
+      helperText.textContent = '✓ Password meets all requirements';
       helperText.style.color = '#10b981';
     }
   }

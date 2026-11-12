@@ -11,9 +11,9 @@
 const checkPermission = (permission) => {
   return async (req, res, next) => {
     try {
-      // Verify token first
+      // Require authenticated user context populated by verifyToken
       const token = req.headers.authorization?.split(' ')[1];
-      if (!token) {
+      if (!token || !req.user || !req.user.id) {
         return res.status(401).json({
           success: false,
           message: 'Authorization required.',
@@ -49,7 +49,7 @@ const checkPermission = (permission) => {
 
       const permissionField = permissionMap[permission];
 
-      if (!admin.permissions[permissionField]) {
+      if (!permissionField || !admin.permissions || !admin.permissions[permissionField]) {
         return res.status(403).json({
           success: false,
           message: `You do not have permission to ${permission}.`,
@@ -59,10 +59,10 @@ const checkPermission = (permission) => {
       req.admin = admin;
       next();
     } catch (error) {
+      console.error('Permission check failed:', error.name || 'Error');
       return res.status(500).json({
         success: false,
         message: 'Permission check failed.',
-        error: error.message,
       });
     }
   };

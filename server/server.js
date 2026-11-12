@@ -11,13 +11,18 @@ const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const validateEnv = () => {
-  const requiredVars = ['MONGODB_URI', 'APP_BASE_URL'];
+  const requiredVars = ['MONGODB_URI', 'APP_BASE_URL', 'JWT_SECRET'];
   const missing = requiredVars.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
     console.error('❌ Missing required environment variables:');
     missing.forEach((key) => console.error(`   - ${key}`));
     console.error('ℹ️  Update your .env file before starting the server.');
+    process.exit(1);
+  }
+
+  if (process.env.JWT_SECRET.trim().length < 16) {
+    console.error('❌ Invalid JWT_SECRET: must be at least 16 characters.');
     process.exit(1);
   }
 

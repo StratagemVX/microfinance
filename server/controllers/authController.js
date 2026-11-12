@@ -9,8 +9,8 @@ const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const Customer = require('../models/Customer');
 const Admin = require('../models/Admin');
+const { getJwtSecret } = require('../middleware/authMiddleware');
 const { sendCustomerPasswordResetEmail, sendAdminPasswordResetEmail } = require('../utils/emailService');
-const { buildAppUrl } = require('../utils/urlUtils');
 
 /**
  * Generate JWT Token
@@ -26,7 +26,7 @@ const generateToken = (id, role, email) => {
       role,
       email,
     },
-    process.env.JWT_SECRET,
+    getJwtSecret(),
     {
       expiresIn: process.env.JWT_EXPIRY || '7d',
     }
@@ -40,23 +40,9 @@ const generateToken = (id, role, email) => {
  */
 const customerRegister = async (req, res) => {
   try {
-    // Log received data for debugging
-    console.log('Received registration data:', {
-      ...req.body,
-      password: '***',
-      confirmPassword: '***'
-    });
-    console.log('Address fields received:', {
-      street: req.body.street,
-      city: req.body.city,
-      state: req.body.state,
-      pincode: req.body.pincode
-    });
-
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.error('Validation errors:', errors.array());
       const errorMessages = errors.array().map(err => ({
         field: err.param,
         message: err.msg
@@ -128,20 +114,7 @@ const customerRegister = async (req, res) => {
       employmentType,
     });
 
-    console.log('Saving customer:', {
-      firstName,
-      lastName,
-      email,
-      phone,
-      address: customer.address,
-      monthlyIncome,
-      occupation,
-      employmentType
-    });
-
     await customer.save();
-
-    console.log('✓ Customer saved successfully:', customer._id);
 
     // Generate token
     const token = generateToken(customer._id, 'customer', customer.email);
@@ -154,17 +127,10 @@ const customerRegister = async (req, res) => {
       customer: customer.getPublicProfile(),
     });
   } catch (error) {
-    console.error('❌ Registration Error:', error);
-    console.error('Error details:', {
-      message: error.message,
-      code: error.code,
-      stack: error.stack
-    });
-    
+    console.error('❌ Registration Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
-      message: 'Registration failed: ' + error.message,
-      error: error.message,
+      message: 'Registration failed.',
     });
   }
 };
@@ -193,10 +159,9 @@ const customerLogin = async (req, res) => {
     if (!customer) {
       return res.status(401).json({
         success: false,
-        message: 'Email not registered',
-        suggestedAction: 'Create a new account or check if you used a different email',
-        registerLink: '/customer/register',
-        details: 'No account found with this email address'
+        message: 'Email or password is incorrect',
+        suggestedAction: 'Check your email and password, or reset your password if forgotten',
+        forgotPasswordLink: '/customer/forgot-password',
       });
     }
 
@@ -240,11 +205,10 @@ const customerLogin = async (req, res) => {
       customer: customer.getPublicProfile(),
     });
   } catch (error) {
-    console.error('Login Error:', error);
+    console.error('Login Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Login failed.',
-      error: error.message,
     });
   }
 };
@@ -272,8 +236,7 @@ const adminLogin = async (req, res) => {
     if (!admin) {
       return res.status(401).json({
         success: false,
-        message: 'Admin account not found',
-        details: 'No admin account exists with this email address'
+        message: 'Invalid email or password',
       });
     }
 
@@ -343,11 +306,10 @@ const adminLogin = async (req, res) => {
       admin: adminData,
     });
   } catch (error) {
-    console.error('Admin Login Error:', error);
+    console.error('Admin Login Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Login failed.',
-      error: error.message,
     });
   }
 };
@@ -414,11 +376,10 @@ const adminRegister = async (req, res) => {
       admin: adminData,
     });
   } catch (error) {
-    console.error('Admin Registration Error:', error);
+    console.error('Admin Registration Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Admin creation failed.',
-      error: error.message,
     });
   }
 };
@@ -456,46 +417,22 @@ const customerForgotPassword = async (req, res) => {
     const resetToken = customer.generateResetToken();
     await customer.save();
 
-    console.log('🔐 Customer reset token created', {
-      customerId: customer._id.toString(),
-      email,
-      expiresAt: customer.resetTokenExpiry,
-      tokenHashPrefix: customer.resetToken?.slice(0, 12),
-    });
-
     try {
-      // Send password reset email (or log link in dev/test mode)
-      const emailResult = await sendCustomerPasswordResetEmail(email, resetToken);
-      if (emailResult?.delivered) {
-        console.log('📧 Customer reset email sent', { email });
-      } else {
-        console.log('📧 Customer reset email not sent (dev/test mode)', {
-          email,
-          previewUrl: emailResult?.previewUrl || null,
-        });
-      }
+      await sendCustomerPasswordResetEmail(email, resetToken);
     } catch (emailError) {
-      console.error('Email sending failed:', emailError.message);
-      // Still return success to user for security, but log the error
-      console.warn('⚠️  Password reset token generated but email delivery failed');
-      try {
-        console.warn('Test link:', buildAppUrl(`/customer/reset-password?token=${resetToken}`));
-      } catch (urlError) {
-        console.warn('Test link unavailable:', urlError.message);
-      }
+      console.error('Customer password reset email error:', emailError.name || 'Error');
     }
 
     res.status(200).json({
       success: true,
-      message: 'Password reset link sent',
+      message: 'If email exists, password reset link has been sent',
       info: 'Check your email for password reset instructions'
     });
   } catch (error) {
-    console.error('Forgot Password Error:', error);
+    console.error('Forgot Password Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to process forgot password request',
-      error: error.message,
     });
   }
 };
@@ -526,10 +463,10 @@ const customerResetPassword = async (req, res) => {
     }
 
     // Validate password length
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long',
+        message: 'Password must be at least 8 characters long',
       });
     }
 
@@ -543,7 +480,6 @@ const customerResetPassword = async (req, res) => {
     }).select('+resetToken +resetTokenExpiry');
 
     if (!customer) {
-      console.warn('❌ Customer reset token invalid or expired');
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired reset token',
@@ -551,15 +487,10 @@ const customerResetPassword = async (req, res) => {
       });
     }
 
-    console.log('✅ Customer reset token validated', { customerId: customer._id.toString() });
-
     // Update password and clear reset token (hashing happens in model pre-save hook)
     customer.password = password;
     customer.clearResetToken();
     await customer.save();
-
-    console.log('🗑️ Customer reset token invalidated', { customerId: customer._id.toString() });
-    console.log('🔐 Customer password reset successful', { customerId: customer._id.toString() });
 
     res.status(200).json({
       success: true,
@@ -567,11 +498,10 @@ const customerResetPassword = async (req, res) => {
       info: 'You can now login with your new password',
     });
   } catch (error) {
-    console.error('Reset Password Error:', error);
+    console.error('Reset Password Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to reset password',
-      error: error.message,
     });
   }
 };
@@ -609,46 +539,25 @@ const adminForgotPassword = async (req, res) => {
     const resetToken = admin.generateResetToken();
     await admin.save();
 
-    console.log('🔐 Admin reset token created', {
-      adminId: admin._id.toString(),
-      email,
-      expiresAt: admin.resetTokenExpiry,
-      tokenHashPrefix: admin.resetToken?.slice(0, 12),
-    });
+    const correlationId = crypto.randomUUID();
+    console.log('🔐 Admin reset flow initiated', { correlationId });
 
     try {
-      // Send password reset email (or log link in dev/test mode)
-      const emailResult = await sendAdminPasswordResetEmail(email, resetToken);
-      if (emailResult?.delivered) {
-        console.log('📧 Admin reset email sent', { email });
-      } else {
-        console.log('📧 Admin reset email not sent (dev/test mode)', {
-          email,
-          previewUrl: emailResult?.previewUrl || null,
-        });
-      }
+      await sendAdminPasswordResetEmail(email, resetToken);
     } catch (emailError) {
-      console.error('Email sending failed:', emailError.message);
-      // Still return success to user for security, but log the error
-      console.warn('⚠️  Password reset token generated but email delivery failed');
-      try {
-        console.warn('Test link:', buildAppUrl(`/admin/reset-password?token=${resetToken}`));
-      } catch (urlError) {
-        console.warn('Test link unavailable:', urlError.message);
-      }
+      console.error('Admin password reset email error:', emailError.name || 'Error');
     }
 
     res.status(200).json({
       success: true,
-      message: 'Password reset link sent',
+      message: 'If email exists, password reset link has been sent',
       info: 'Check your email for password reset instructions'
     });
   } catch (error) {
-    console.error('Admin Forgot Password Error:', error);
+    console.error('Admin Forgot Password Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to process forgot password request',
-      error: error.message,
     });
   }
 };
@@ -679,10 +588,10 @@ const adminResetPassword = async (req, res) => {
     }
 
     // Validate password length
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long',
+        message: 'Password must be at least 8 characters long',
       });
     }
 
@@ -696,7 +605,6 @@ const adminResetPassword = async (req, res) => {
     }).select('+resetToken +resetTokenExpiry');
 
     if (!admin) {
-      console.warn('❌ Admin reset token invalid or expired');
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired reset token',
@@ -704,16 +612,11 @@ const adminResetPassword = async (req, res) => {
       });
     }
 
-    console.log('✅ Admin reset token validated', { adminId: admin._id.toString() });
-
     // Update password and clear reset token (hashing happens in model pre-save hook)
     admin.password = password;
     admin.clearResetToken();
     admin.resetLoginAttempts(); // Reset login attempts after password reset
     await admin.save();
-
-    console.log('🗑️ Admin reset token invalidated', { adminId: admin._id.toString() });
-    console.log('🔐 Admin password reset successful', { adminId: admin._id.toString() });
 
     res.status(200).json({
       success: true,
@@ -721,11 +624,10 @@ const adminResetPassword = async (req, res) => {
       info: 'You can now login with your new password',
     });
   } catch (error) {
-    console.error('Admin Reset Password Error:', error);
+    console.error('Admin Reset Password Error:', error.name || 'Error');
     res.status(500).json({
       success: false,
       message: 'Failed to reset password',
-      error: error.message,
     });
   }
 };
@@ -746,7 +648,7 @@ const verifyTokenEndpoint = async (req, res) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, getJwtSecret());
 
     res.status(200).json({
       success: true,
@@ -757,7 +659,6 @@ const verifyTokenEndpoint = async (req, res) => {
     res.status(401).json({
       success: false,
       message: 'Token verification failed.',
-      error: error.message,
     });
   }
 };
