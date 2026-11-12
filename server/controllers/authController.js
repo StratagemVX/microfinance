@@ -539,12 +539,8 @@ const adminForgotPassword = async (req, res) => {
     const resetToken = admin.generateResetToken();
     await admin.save();
 
-    console.log('🔐 Admin reset token created', {
-      adminId: admin._id.toString(),
-      email,
-      expiresAt: admin.resetTokenExpiry,
-      tokenHashPrefix: admin.resetToken?.slice(0, 12),
-    });
+    const correlationId = crypto.randomUUID();
+    console.log('🔐 Admin reset flow initiated', { correlationId });
 
     try {
       await sendAdminPasswordResetEmail(email, resetToken);

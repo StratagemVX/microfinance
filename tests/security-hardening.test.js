@@ -237,6 +237,28 @@ test('authController forgot/reset password prevents enumeration, short passwords
     await authController.customerForgotPassword({ body: { email: 'missing@example.test' } }, missingRes);
     assert.deepEqual(missingRes.body, foundRes.body);
 
+    const hashedToken = 'abcdef1234567890hashedresetvalue';
+    Admin.findOne = async () => ({
+      _id: 'admin-secret-id-999',
+      resetToken: hashedToken,
+      resetTokenExpiry: new Date('2099-01-01T00:00:00.000Z'),
+      generateResetToken: () => secretToken,
+      save: async () => {},
+    });
+
+    const adminForgotRes = createMockRes();
+    const { logs: adminLogs } = await captureConsole(() =>
+      authController.adminForgotPassword({ body: { email: 'admin-pii@example.test' } }, adminForgotRes)
+    );
+    assert.equal(adminForgotRes.statusCode, 200);
+    assert.ok(adminLogs.includes('correlationId'));
+    assert.ok(!adminLogs.includes('admin-secret-id-999'));
+    assert.ok(!adminLogs.includes('admin-pii@example.test'));
+    assert.ok(!adminLogs.includes('2099-01-01'));
+    assert.ok(!adminLogs.includes('abcdef123456'));
+    assert.ok(!adminLogs.includes('tokenHashPrefix'));
+    assert.ok(!adminLogs.includes(secretToken));
+
     const shortCustRes = createMockRes();
     await authController.customerResetPassword(
       { body: { token: 'abc', password: '1234567', confirmPassword: '1234567' } },
